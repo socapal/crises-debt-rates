@@ -1,0 +1,2 @@
+# money-dv
+Our visualization project focuses on the analysis of the relationship between public debt expenditure and interbank interest rates in Mexico (from 1985 and up to 2020), paying particular attention to the multiple crises occurred during that period. In order to do so, we use the (interest rate data) and the (debt data). We also use a time series analysis to plot the most significant lag in interest rate as the external variable (x-axis).  
