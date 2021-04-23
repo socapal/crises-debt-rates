@@ -7,8 +7,8 @@
 ####################     Data Visualization     ################################
 ################################################################################
 ################################################################################
-###################     Anna Karina Pérez Peña      ############################
-###################    Sebastián Ocampo Palacios    ############################
+###################     Anna Karina PÃ©rez PeÃ±a      ############################
+###################    SebastiÃ¡n Ocampo Palacios    ############################
 ################################################################################
 --------------------------------------------------------------------------------
   
@@ -47,39 +47,31 @@ DATA$Dates=dates #Redifines date data.
 
 summary(DATA)
 
-#Obtaining real values for total imports and exports
-  base= 60.25031 #INPC, December 2015 as base year.
-  NAFTA$INPC=NAFTA$INPC/base *100 #We create the deflator coefficient
+#Obtaining real values for debt.
+  base= 109.27100 #INPC, December 2015 as base year.
+  DATA$INPC=DATA$INPC/base *100 #We create the deflator coefficient
 
-  NAFTA$ExporT_sa=NAFTA$ExporT_sa/NAFTA$INPC #Deflated Exports
-  NAFTA$ImportT_sa=NAFTA$ImportT_sa/NAFTA$INPC #Deflated Imports
-
-  #Obtaining real values for consumption imports under NAFTA.
-  NAFTA$Anual_IC_NMF[is.na(NAFTA$Anual_IC_NMF)] = 0 #Defining Tariffs
-        #We asume a 0 tariff for NAs in our data.
-  NAFTA$Anual_IC_NMF=NAFTA$Anual_IC_NMF/100  #Tariffs into percentages.
-
-  #Real Consumption under NAFTA
-NAFTA$ImportC_sa=NAFTA$ImportC_sa/NAFTA$INPC * (1-NAFTA$Anual_IC_NMF)
-                 #Deflated Consumption Imports * (1-tariff) 
+  DATA$INTERNAL_DEBT=DATA$INTERNAL_DEBT/DATA$INPC #Deflated Debt
 
 
 # 2. Time Series  ---------------------------------------------------------
-NAFTA_TS=xts(x=NAFTA, order.by = dates) #xts object
-NAFTA_TS=NAFTA_TS[,2:ncol(NAFTA_TS)] #Removes redundant columns (dates)
+DATA_TS=xts(x=DATA, order.by = dates) #xts object
+DATA_TS=DATA_TS[,2:ncol(DATA_TS)] #Removes redundant columns (dates)
 
-plot(x=dates, y=NAFTA_TS$ImportT_sa, col="red")
+plot(x=dates, y=DATA_TS$INTERNAL_DEBT, col="red")
 par(new=TRUE)
-plot(x=dates, y=NAFTA_TS$ImportC_sa, col="blue")
+plot(x=dates, y=DATA_TS$TIIE91, col="blue")
 par(new=TRUE)
-plot(x=dates, y=NAFTA_TS$ExporT_sa, col="green")
+plot(x=dates, y=DATA_TS$CETES_28 col="green")
+par(new=TRUE)
+plot(x=dates, y=DATA_TS$TIIE_28 col="brown")
 
-
+#We need to deseasonlize our data using the package "seasonal".
 
 # 3. Graphs ---------------------------------------------------------------
 
 # Finally the plot
-dygraph(NAFTA_TS[,1:3], main= "Importaciones de consumo bajo el NAFTA") %>%
+dygraph(DATA_TS[,1:3], main= "Debt!") %>%
   dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.1, drawGrid = FALSE, colors="#D8AE5A") %>%
   dyRangeSelector() %>%
   dyCrosshair(direction = "vertical") %>%
@@ -87,7 +79,7 @@ dygraph(NAFTA_TS[,1:3], main= "Importaciones de consumo bajo el NAFTA") %>%
   dyRoller(rollPeriod = 1)
 
 
-##Ejemplo Erik-Luis
+##Ejemplos Erik-Luis
 
 dygraph(FE, main = "Total mexican internal debt: nominal amount in pesos by category")%>%
   dySeries("Total_Debt",strokeWidth = 3)%>%
