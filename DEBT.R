@@ -7,11 +7,12 @@
 ####################     Data Visualization     ################################
 ################################################################################
 ################################################################################
-###################     Anna Karina P√©rez Pe√±a      ############################
-###################    Sebasti√°n Ocampo Palacios    ############################
+###################     Anna Karina P√©rez Pe√±a      ##########################
+###################    Sebasti√°n Ocampo Palacios    ###########################
 ################################################################################
 --------------------------------------------------------------------------------
-  
+
+# CODE -------------------------------------------------------------------
 
 # 1. Libraries & data -----------------------------------------------------
 
@@ -19,6 +20,8 @@ library(readxl)
 library(xts)
 library(dplyr)
 library(dygraphs)
+library(seasonal)
+library(ggplot2)
 
 
 setwd("C:/Users/socap/OneDrive/Documentos/GitHub/crisis-debt-rates")
@@ -63,18 +66,16 @@ summary(DATA)
 # 2. Time Series  ---------------------------------------------------------
   
   # 1997-2020. 
+  dates=dates[145:432]
+  
   #We need to deseasonalize our data using the package "seasonal".
-  
-  DATA_TS=xts(x=DATA[145:432,], order.by = dates[145:432]) #xts object for relevant period (1997-2020)
-  DATA_TS=DATA_TS[,2:ncol(DATA_TS)] #Removes redundant column (dates)
-  
-  
   DATA=DATA[145:432,] # Timeframe 1997-2020.
   DATA=DATA[c("INTERNAL_DEBT", "AVG_TIIE91")] #Reduces variables
   
   #Deseasonalize
-Des_data <- ts(coredata(DATA),frequency=12,start=c(1997,1), end = c(2020, 12))
-inData <- seas(Des_data) #seas function.
+  Des_data <- ts(coredata(DATA),frequency=12,start=c(1997,1), end = c(2020, 12))
+  inData <- seas(Des_data) #seas function.
+  Des_data=as.data.frame(inData)
 
 #?
 #DATA<-cbind(DATA$INTERNAL_DEBT,DATA$AVG_TIIE91) 
@@ -83,35 +84,25 @@ inData <- seas(Des_data) #seas function.
 #Data = as.data.frame(DATA)
 
 
+#We add the seasonal adjusted data to our data.
+DATA<-cbind(dates, DATA, Des_data$INTERNAL_DEBT.seasonaladj, Des_data$AVG_TIIE91.seasonaladj) 
+colnames(DATA)= c("dates", "INTERNAL_DEBT", "AVG_TIIE91", "INTERNAL_DEBT_SA", "AVG_TIIE91_SA")
+  
+  
+  
 # 3. Graphs ---------------------------------------------------------------
 
-plot(x=dates, y=DATA_TS$INTERNAL_DEBT, col="red")
-par(new=TRUE)
-plot(x=dates, y=DATA_TS$TIIE91, col="blue")
-
-
-
-#Hasta ac· voy...
-
-#Gr·fica----------------------------
-Date<-seq(as.Date("1997-01-01"), as.Date("2020-12-01"), by="month")
-Data<-cbind(Date, Data)
+#ggplot2 graph----------------------------
 
 # Start with a usual ggplot2 call:
 # ggplot(db, aes(x=date, y=as.numeric(`AVG_TIIE28`))) +
-#   #Data---------------------------------
-data=read_excel("DEBT85-20.xlsx", range = "A147:G434", col_names = FALSE)
-#db <- xts(x = db, order.by= seq(as.Date("1995-03-01", "%Y-%m-%d"), length=286, by="months"))
 
-colnames(data)=c("date", "internal debt","total net debt", "AVG_TIIE28", "AVG_TIIE91", "cetes_28", "INPC")
+#   #Data= DATA
 
-plot(x=data$date,y=data$`internal debt`,type="l")
-plot(x=data$date,y=data$AVG_TIIE91,type="l")
-
-data=data[,-c(3, 4, 6)]
-
-
-
+plot(x=DATA$date,y=DATA$INTERNAL_DEBT,type="l") 
+plot(x=DATA$date,y=DATA$AVG_TIIE91,type="l")
+plot(x=DATA$date,y=DATA$INTERNAL_DEBT_SA,type="l") #Seasonal Adjusted 
+plot(x=DATA$date,y=DATA$AVG_TIIE91_SA,type="l") #Seasonal Adjusted
 
 #   # Custom the Y scales:
 #   scale_y_continuous(
@@ -129,9 +120,9 @@ coeff <- as.numeric(100000000)
 rateColor <- "#69b3a2"
 debtColor <- rgb(0.2, 0.6, 0.9, 1)
 
-ggplot(Data, aes(x=Date))+
-  geom_line( aes(y=as.numeric(`interest rate`)), size=1, color=rateColor) + 
-  geom_line( aes(y=`internal debt`/coeff), size=1, color=debtColor) +  # Divide by 10 to get the same range than the temperature
+ggplot(DATA, aes(x=dates))+
+  geom_line( aes(y=as.numeric(AVG_TIIE91)), size=1, color=rateColor) + 
+  geom_line( aes(y=INTERNAL_DEBT/coeff), size=1, color=debtColor) +  # Divide by 10 to get the same range
   
   scale_y_continuous(
     # Features of the first axis
@@ -141,7 +132,7 @@ ggplot(Data, aes(x=Date))+
     sec.axis = sec_axis(~.*coeff, name="Internal Debt")
   ) +
   
-  theme_ipsum() +
+  #theme_ipsum() +  No est· funcionando esta lÌnea :( 
   
   theme(
     axis.title.y = element_text(color = rateColor, size=13),
@@ -152,13 +143,33 @@ ggplot(Data, aes(x=Date))+
   scale_x_date(date_labels = "%Y-%m", date_breaks = "2 year") +
   theme(axis.text.x=element_text(angle=60, hjust=1))
 
-# Finally the plot
-dygraph(DATA_TS[,1:3], main= "Debt!") %>%
+
+
+#Graph as Time Series.
+DATA_TS=xts(x=DATA, order.by = dates) #xts object for relevant period (1997-2020)
+DATA_TS=DATA_TS[,2:ncol(DATA_TS)] #Removes redundant column (dates)
+
+# Another plot
+dygraph(DATA_TS, main= "Debt!") %>%
   dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.1, drawGrid = FALSE, colors="#D8AE5A") %>%
   dyRangeSelector() %>%
   dyCrosshair(direction = "vertical") %>%
   dyHighlight(highlightCircleSize = 5, highlightSeriesBackgroundAlpha = 0.2, hideOnMouseOut = FALSE)  %>%
   dyRoller(rollPeriod = 1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ##Ejemplos Erik-Luis
