@@ -92,7 +92,7 @@ colnames(DATA)= c("dates", "INTERNAL_DEBT", "AVG_TIIE91", "INTERNAL_DEBT_SA", "A
   
 # 3. Graphs ---------------------------------------------------------------
 
-#ggplot2 graph----------------------------
+#ggplot2 - General graph----------------------------
 
 # Start with a usual ggplot2 call:
 # ggplot(db, aes(x=date, y=as.numeric(`AVG_TIIE28`))) +
@@ -116,7 +116,7 @@ plot(x=DATA$date,y=DATA$AVG_TIIE91_SA,type="l") #Seasonal Adjusted
 #   
 #   theme_ipsum()
 
-coeff <- as.numeric(100000000)
+coeff <- as.numeric(1000000)
 rateColor <- "#69b3a2"
 debtColor <- rgb(0.2, 0.6, 0.9, 1)
 
@@ -149,13 +149,108 @@ ggplot(DATA, aes(x=dates))+
 DATA_TS=xts(x=DATA, order.by = dates) #xts object for relevant period (1997-2020)
 DATA_TS=DATA_TS[,2:ncol(DATA_TS)] #Removes redundant column (dates)
 
-# Another plot
-dygraph(DATA_TS, main= "Debt!") %>%
+# Another plot (USELESS)
+dygraph(DATA_TS[,3:4], main= "Debt!") %>%
   dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.1, drawGrid = FALSE, colors="#D8AE5A") %>%
   dyRangeSelector() %>%
   dyCrosshair(direction = "vertical") %>%
   dyHighlight(highlightCircleSize = 5, highlightSeriesBackgroundAlpha = 0.2, hideOnMouseOut = FALSE)  %>%
   dyRoller(rollPeriod = 1)
+
+
+
+
+# 4. Event Studies --------------------------------------------------------
+
+#We subset by years.
+crisis_08=DATA_TS[c("2007","2008", "2009", "2010", "2011")]
+  dates_08=seq(from=as.Date("2007-01-01"), to=as.Date("2011-12-01"), by="month")
+
+crisis_20=DATA_TS[c("2019", "2020")]
+  dates_20=seq(from=as.Date("2019-01-01"), to=as.Date("2020-12-01"), by="month")
+
+  #We want to plot the year before the beginning of each crisis and the three years afterwards.
+T=1:60 #5 years= 60 months.
+
+#We pair dates to each month's position.
+crisis_08$T=T
+crisis_20$T=T[1:nrow(crisis_20)] #24 obs. for the 2020 crisis.
+
+#Disband xts
+crisis_08=(as.data.frame(crisis_08))
+crisis_20=(as.data.frame(crisis_20))
+
+#Compensating shorter data frame
+crisis_20=rbind(crisis_20, crisis_20[25:60, ])
+crisis_20$T=T #60 obs. for the 2020 crisis.
+
+#Graph
+coeff <- as.numeric(1000000)
+rateColor <- "#69b3a2"
+debtColor <- rgb(0.2, 0.6, 0.9, 1)
+
+
+#2008
+ggplot(crisis_08, aes(x=T))+
+  geom_line( aes(y=as.numeric(AVG_TIIE91_SA)), size=1, color=rateColor) + #2008 TIIE
+  geom_line( aes(y=INTERNAL_DEBT_SA/coeff), size=1, color=debtColor) +  #2008 DEBT
+  
+  scale_y_continuous(
+    # Features of the first axis
+    name = "Interest Rate",
+    
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~.*coeff, name="Internal Debt")
+  ) +
+  
+  #theme_ipsum() +  No está funcionando esta línea :( 
+  
+  theme(
+    axis.title.y = element_text(color = rateColor, size=13),
+    axis.title.y.right = element_text(color = debtColor, size=13)
+  ) +
+  
+  ggtitle("Title") +
+ # scale_x_date(date_labels = "%Y-%m", date_breaks = "2 year") +
+  theme(axis.text.x=element_text(angle=60, hjust=1))
+
+
+
+#2020
+ggplot(crisis_20, aes(x=T))+
+  geom_line( aes(y=as.numeric(AVG_TIIE91_SA)), size=1, color=rateColor) + #2008 TIIE
+  geom_line( aes(y=INTERNAL_DEBT_SA/coeff), size=1, color=debtColor) +  #2008 DEBT
+  
+  scale_y_continuous(
+    # Features of the first axis
+    name = "Interest Rate",
+    
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~.*coeff, name="Internal Debt")
+  ) +
+  
+  #theme_ipsum() +  No está funcionando esta línea :( 
+  
+  theme(
+    axis.title.y = element_text(color = rateColor, size=13),
+    axis.title.y.right = element_text(color = debtColor, size=13)
+  ) +
+  
+  ggtitle("Title") +
+  # scale_x_date(date_labels = "%Y-%m", date_breaks = "2 year") +
+  theme(axis.text.x=element_text(angle=60, hjust=1))
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
