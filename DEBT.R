@@ -57,7 +57,7 @@ summary(DATA)
 #Obtaining real values for debt.
 base= 109.27100 #INPC, December 2015 as base year.
 # Alternative is 99.90910
-DATA$INPC=DATA$INPC/base *100 #We create the deflator coefficient
+DATA$INPC=DATA$INPC/base #We create the deflator coefficient
 
 DATA$INTERNAL_DEBT=DATA$INTERNAL_DEBT/DATA$INPC #Deflated Debt
 DATA$AVG_TIIE91=DATA$AVG_TIIE91/DATA$INPC
@@ -168,13 +168,17 @@ dygraph(DATA_TS[,3:4], main= "Debt!") %>%
 #We subset by years.
 crisis_08=DATA_TS[c("2007","2008", "2009", "2010", "2011")]
 dates_08=seq(from=as.Date("2007-01-01"), to=as.Date("2011-12-01"), by="month")
-crisis_08$INTERNAL_DEBT_EE=(as.numeric(crisis_08$INTERNAL_DEBT_SA)/30574098)-1
-crisis_08$AVG_TIIE91_EE=(crisis_08$AVG_TIIE91_SA/0.14143449)-1
+crisis_08$INTERNAL_DEBT_EE=(as.numeric(crisis_08$INTERNAL_DEBT_SA)-3057409797)#30574098
+crisis_08$AVG_TIIE91_EE=(crisis_08$AVG_TIIE91_SA-14.143449)
+#crisis_08$INTERNAL_DEBT_EE=(as.numeric(crisis_08$INTERNAL_DEBT_SA)/30574098)-1
+#crisis_08$AVG_TIIE91_EE=(crisis_08$AVG_TIIE91_SA/0.14143449)-1
 
 crisis_20=DATA_TS[c("2019", "2020")]
 dates_20=seq(from=as.Date("2019-01-01"), to=as.Date("2020-12-01"), by="month")
-crisis_20$INTERNAL_DEBT_EE=(as.numeric(crisis_20$INTERNAL_DEBT_SA)/60380768)-1
-crisis_20$AVG_TIIE91_EE=(crisis_20$AVG_TIIE91_SA/0.06998935)-1
+crisis_20$INTERNAL_DEBT_EE=(as.numeric(crisis_20$INTERNAL_DEBT_SA)-6038076779)
+crisis_20$AVG_TIIE91_EE=(crisis_20$AVG_TIIE91_SA-6.998935)
+#crisis_20$INTERNAL_DEBT_EE=(as.numeric(crisis_20$INTERNAL_DEBT_SA)/60380768)-1
+#crisis_20$AVG_TIIE91_EE=(crisis_20$AVG_TIIE91_SA/0.06998935)-1
 
 #We want to plot the year before the beginning of each crisis and the three years afterwards.
 #T=1:60 #5 years= 60 months.
@@ -202,7 +206,7 @@ Date<-seq(as.Date("2019-01-01"), as.Date("2020-12-01"), by="month")
 crisis_20<-cbind(Date, crisis_20)
 
 #Graph
-coeff <- as.numeric(1)#100000000
+coeff <- as.numeric(100000000)#100000000
 rateColor <- "#69b3a2"
 debtColor <- rgb(0.2, 0.6, 0.9, 1)
 
@@ -214,21 +218,21 @@ financial=ggplot(crisis_08, aes(x=Date))+
   
   scale_y_continuous(
     # Features of the first axis
-    name = "Interest Rate Growth Rate"
+    name = "Change in values", breaks = seq(-10,10,1.5),
     
     # Add a second axis and specify its features
-    #sec.axis = sec_axis(~.*coeff, name="Internal Debt")
+    sec.axis = sec_axis(~.*coeff, breaks = seq(-1000000000,1000000000,150000000))
   ) +
+  geom_vline(xintercept=as.Date("2008-08-01"), color="black", size=1, linetype="dashed")+
   
   theme_ipsum() +  #No está funcionando esta línea :( 
   
   theme(
-    axis.title.y = element_text(color = rateColor, size=13),
+    axis.title.y = element_text(color = "black", size=13),
     #axis.title.y.right = element_text(color = debtColor, size=13)
   ) +
-  geom_vline(xintercept=as.Date("2008-08-01"), color="black", size=.5, linetype="dashed")+
   
-  annotate(geom="text", x=as.Date("2009-05-01"), y=0.3, 
+  annotate(geom="text", x=as.Date("2008-12-01"), y=7, 
           label="2008 financial crisis \nstarts in Mexico", size=4)+
   labs(title="Interbank Interest Rates and Internal Public Debt Under Economic Stress", 
        subtitle="A visual analysis of the relationship between public expenditure and the loan market in Mexico during the 2008 and 2020 economic crises.",
@@ -249,20 +253,20 @@ covid=ggplot(crisis_20, aes(x=Date))+
   
   scale_y_continuous(
     # Features of the first axis
-    name = "Internal Debt Growth Rate", n.breaks =4
+  name="Change in values", breaks = seq(-10,10,1.5), n.breaks =8,
     # Add a second axis and specify its features
-    #sec.axis = sec_axis(~.*coeff, name="Internal Debt")
+    sec.axis = sec_axis(~.*coeff,  breaks = seq(-1000000000,1000000000,150000000))
   ) +
+  geom_vline(xintercept=as.Date("2020-03-01"), color="black", size=1, linetype="dashed")+
   
  theme_ipsum() +  #No está funcionando esta línea :( 
   
   theme(
-    axis.title.y = element_text(color = debtColor, size=13)
+    axis.title.y = element_text(color = "black", size=13)
     #axis.title.y.right = element_text(color = debtColor, size=13) 
   ) +
-  geom_vline(xintercept=as.Date("2020-03-01"), color="black", size=.5, linetype="dashed")+
   
-  annotate(geom="text", x=as.Date("2020-07-01"), y=0.15, 
+  annotate(geom="text", x=as.Date("2020-05-01"), y=5, 
            label="2020 COVID-19 \ncrisis starts", size=4)+
   
   #ggtitle("Title") +
@@ -275,7 +279,6 @@ covid
 
 crisis=financial+covid
 crisis
-
 
 
 
