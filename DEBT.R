@@ -231,7 +231,7 @@ financial=ggplot(crisis_08, aes(x=Date))+
   annotate(geom="text", x=as.Date("2009-05-01"), y=0.3, 
           label="2008 financial crisis \nstarts in Mexico", size=4)+
   labs(title="Interbank Interest Rates and Internal Public Debt Under Economic Stress", 
-       subtitle="A visual analysis of the relationship between public expenditure and the loan market in Mexico during the 2008 economic crisis.",
+       subtitle="A visual analysis of the relationship between public expenditure and the loan market in Mexico during the 2008 and 2020 economic crises.",
        caption="Sources: BANXICO, Sistema de Información Económica | Authors: Karina Pérez, Sebastián Ocampo")+
   
   #ggtitle(subtitle ="crisis 2008") +
@@ -275,18 +275,6 @@ covid
 
 crisis=financial+covid
 crisis
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
