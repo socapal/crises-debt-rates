@@ -23,6 +23,8 @@ library(dplyr)
 library(dygraphs)
 library(seasonal)
 library(ggplot2)
+install.packages("patchwork")
+library(patchwork)
 
 rm(list=ls())
 setwd("C:/Users/secun/OneDrive/Documentos/6to/Money/Data Vizualization Project")
@@ -192,6 +194,13 @@ crisis_20=(as.data.frame(crisis_20))
 #crisis_20=rbind(crisis_20, crisis_20[25:60, ])
 #crisis_20$T=T #60 obs. for the 2020 crisis.
 
+#Date column
+Date<-seq(as.Date("2007-01-01"), as.Date("2011-12-01"), by="month")
+crisis_08<-cbind(Date, crisis_08)
+
+Date<-seq(as.Date("2019-01-01"), as.Date("2020-12-01"), by="month")
+crisis_20<-cbind(Date, crisis_20)
+
 #Graph
 coeff <- as.numeric(1)#100000000
 rateColor <- "#69b3a2"
@@ -199,55 +208,73 @@ debtColor <- rgb(0.2, 0.6, 0.9, 1)
 
 
 #2008
-ggplot(crisis_08, aes(x=T))+
+financial=ggplot(crisis_08, aes(x=Date))+
   geom_line( aes(y=as.numeric(AVG_TIIE91_EE)), size=1, color=rateColor) + #2008 TIIE
   geom_line( aes(y=INTERNAL_DEBT_EE/coeff), size=1, color=debtColor) +  #2008 DEBT
   
   scale_y_continuous(
     # Features of the first axis
-    name = "Interest Rate",
+    name = "Interest Rate Growth Rate"
     
     # Add a second axis and specify its features
-    sec.axis = sec_axis(~.*coeff, name="Internal Debt")
+    #sec.axis = sec_axis(~.*coeff, name="Internal Debt")
   ) +
   
   theme_ipsum() +  #No está funcionando esta línea :( 
   
   theme(
     axis.title.y = element_text(color = rateColor, size=13),
-    axis.title.y.right = element_text(color = debtColor, size=13)
+    #axis.title.y.right = element_text(color = debtColor, size=13)
   ) +
+  geom_vline(xintercept=as.Date("2008-08-01"), color="black", size=.5, linetype="dashed")+
   
-  ggtitle("Title") +
-  # scale_x_date(date_labels = "%Y-%m", date_breaks = "2 year") +
-  theme(axis.text.x=element_text(angle=60, hjust=1))
-
+  annotate(geom="text", x=as.Date("2009-05-01"), y=0.3, 
+          label="2008 financial crisis \nstarts in Mexico", size=4)+
+  labs(title="Interbank Interest Rates and Internal Public Debt Under Economic Stress", 
+       subtitle="A visual analysis of the relationship between public expenditure and the loan market in Mexico during the 2008 economic crisis.",
+       caption="Sources: BANXICO, Sistema de Información Económica | Authors: Karina Pérez, Sebastián Ocampo")+
+  
+  #ggtitle(subtitle ="crisis 2008") +
+  #scale_x_continuous(breaks=seq(-19,40,3))+
+  scale_x_date(date_labels = "%Y-%m", date_breaks = "4 month") +
+  theme(axis.text.x=element_text(angle=60, hjust=1), axis.title.x = element_text(size=13))
+financial
 
 
 #2020
-
-ggplot(crisis_20, aes(x=T))+
-  geom_line( aes(y=as.numeric(AVG_TIIE91_EE)), size=1, color=rateColor) + #2008 TIIE
-  geom_line( aes(y=INTERNAL_DEBT_EE/coeff), size=1, color=debtColor) +  #2008 DEBT
+#colors <- c("Internal debt" = debtColor, "Interest rate" = rateColor)
+covid=ggplot(crisis_20, aes(x=Date))+
+  geom_line( aes(y=as.numeric(AVG_TIIE91_EE)), size=1, color=rateColor, show.legend = TRUE) + #2008 TIIE
+  geom_line( aes(y=INTERNAL_DEBT_EE/coeff), size=1, color=debtColor, show.legend = TRUE) + #2008 DEBT
   
   scale_y_continuous(
     # Features of the first axis
-    name = "Interest Rate",
-    
+    name = "Internal Debt Growth Rate", n.breaks =4
     # Add a second axis and specify its features
-    sec.axis = sec_axis(~.*coeff, name="Internal Debt")
+    #sec.axis = sec_axis(~.*coeff, name="Internal Debt")
   ) +
   
  theme_ipsum() +  #No está funcionando esta línea :( 
   
   theme(
-    axis.title.y = element_text(color = rateColor, size=13),
-    axis.title.y.right = element_text(color = debtColor, size=13)
+    axis.title.y = element_text(color = debtColor, size=13)
+    #axis.title.y.right = element_text(color = debtColor, size=13) 
   ) +
+  geom_vline(xintercept=as.Date("2020-03-01"), color="black", size=.5, linetype="dashed")+
   
-  ggtitle("Title") +
+  annotate(geom="text", x=as.Date("2020-07-01"), y=0.15, 
+           label="2020 COVID-19 \ncrisis starts", size=4)+
+  
+  #ggtitle("Title") +
   # scale_x_date(date_labels = "%Y-%m", date_breaks = "2 year") +
-  theme(axis.text.x=element_text(angle=60, hjust=1))
+  scale_x_date(date_labels = "%Y-%m", date_breaks = "2 month") +
+  theme(axis.text.x=element_text(angle=60, hjust=1),, axis.title.x = element_text(size=13))
+  #scale_colour_manual(values = colors)
+covid
+
+
+crisis=financial+covid
+crisis
 
 
 
@@ -276,39 +303,5 @@ ggplot(crisis_20, aes(x=T))+
 
 
 
-
-
-
-
-
-
-
-
-##Ejemplos Erik-Luis
-
-dygraph(FE, main = "Total mexican internal debt: nominal amount in pesos by category")%>%
-  dySeries("Total_Debt",strokeWidth = 3)%>%
-  dySeries("Other_Values", label = "Intern Debt in dollars", strokeWidth = 2)%>%
-  dyAxis("y", label = "Debt (thousands of millions)")%>%
-  dyAxis("x", label = "Dates" )%>%
-  dyOptions(axisLineWidth = 1.5)%>%
-  dyEvent("1994-1-1", "1994-Begining of the Debt Crisis", labelLoc = "top")%>%
-  dyEvent("1997-1-1", "1997-End of the Debt Crisis", labelLoc = "top")
-
-
-dygraph(FF, main = "Tesobonos and other types of debt during tequila crisis")%>%
-  dySeries("Total_Debt",strokeWidth = 4)%>%
-  dySeries("Tesobonos", strokeWidth = 4)%>%
-  dyAnnotation("1993-05-01", text = "This series represnt intern debt in dollar, more
-                  than half of the intern debt was in dollars. Tesobonos is part of it")%>%
-  dyAxis("y", label = "Debt (thousands of millions)")%>%
-  dyAxis("x", label = "Dates" )%>%
-  dyOptions(axisLineWidth = 1.5)%>%
-  dyRangeSelector(dateWindow = c("1993-01-01", "1997-12-01"))
-
-
-# save the widget
-# library(htmlwidgets)
-# saveWidget(p, file=paste0( getwd(), "/HtmlWidget/dygraphs318.html"))
 
 
