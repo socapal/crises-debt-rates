@@ -22,6 +22,11 @@ library(dplyr)
 library(dygraphs)
 library(seasonal)
 library(ggplot2)
+<<<<<<< Updated upstream
+=======
+#install.packages("patchwork")
+library(patchwork)
+>>>>>>> Stashed changes
 
 
 setwd("C:/Users/socap/OneDrive/Documentos/GitHub/crisis-debt-rates")
@@ -159,9 +164,13 @@ dygraph(DATA_TS[,3:4], main= "Debt!") %>%
   dyRoller(rollPeriod = 1)
 
 
+<<<<<<< Updated upstream
 
 
 # 4. Event Studies --------------------------------------------------------
+=======
+#C:\Users\socap\AppData\Local\Microsoft\Windows\Fonts/ARIALN.ttf
+>>>>>>> Stashed changes
 
 #We subset by years.
 crisis_08=DATA_TS[c("2007","2008", "2009", "2010", "2011")]
@@ -199,9 +208,15 @@ debtColor <- rgb(0.2, 0.6, 0.9, 1)
 
 #2008
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 ggplot(crisis_08, aes(x=T))+
   geom_line( aes(y=as.numeric(AVG_TIIE91_SA)), size=1, color=rateColor) + #2008 TIIE
   geom_line( aes(y=INTERNAL_DEBT_SA/coeff), size=1, color=debtColor) +  #2008 DEBT
+=======
+financial= ggplot(crisis_08, aes(x=Date))+
+  geom_line( aes(y=as.numeric(AVG_TIIE91_EE)), size=1.2, color=rateColor) + #2008 TIIE
+  geom_line( aes(y=INTERNAL_DEBT_EE/coeff), size=1.2, color=debtColor) +  #2008 DEBT
+>>>>>>> Stashed changes
   
 =======
 financial=ggplot(crisis_08, aes(x=Date))+
@@ -213,6 +228,7 @@ financial=ggplot(crisis_08, aes(x=Date))+
   scale_y_continuous(
     
     # Features of the first axis
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
     name = "Interest Rate",
 =======
@@ -235,6 +251,34 @@ financial=ggplot(crisis_08, aes(x=Date))+
   ggtitle("Title") +
  # scale_x_date(date_labels = "%Y-%m", date_breaks = "2 year") +
   theme(axis.text.x=element_text(angle=60, hjust=1))
+=======
+      name = "Porcentual Changes", limits=c(-0.6, 0.4), minor_breaks = NULL 
+  )  + 
+  
+  scale_x_date(name="", date_labels = "%Y-%m", date_breaks = "10 month", minor_breaks = NULL) +
+ 
+  #Tema
+  
+  theme_bw()+
+  theme_ipsum_rc()+
+  
+  theme(
+    axis.title.y = element_text(color = rateColor, size=13),
+    axis.text.x=element_text(angle=60, hjust=1), 
+    axis.title.x = element_text(size=13),
+    
+    #Removes grid
+    panel.border = element_blank(), 
+    panel.grid.major.y = element_blank(),
+    panel.grid.major.x = element_blank()
+    
+  ) +
+  
+  geom_vline(xintercept=as.Date("2008-08-01"), color="gray", size=.5, linetype="solid")+
+  
+  annotate(geom="text", x=as.Date("2009-05-01"), y=0.3, 
+          label="Financial crisis \n\ starts in Mexico", size=4) +
+>>>>>>> Stashed changes
 
 =======
   scale_x_date(name=NULL, date_labels = "%Y-%m", date_breaks = "4 month", minor_breaks = NULL
@@ -251,6 +295,7 @@ financial=ggplot(crisis_08, aes(x=Date))+
   labs(title="Global Financial Crisis (2008)")+ theme_ipsum_rc()+
   theme(axis.text.x=element_text(angle=60, hjust=1), axis.title.x = element_text(size=13))
 
+<<<<<<< Updated upstream
 financial
 >>>>>>> Stashed changes
 
@@ -260,9 +305,20 @@ financial
 ggplot(crisis_20, aes(x=T))+
   geom_line( aes(y=as.numeric(AVG_TIIE91_SA)), size=1, color=rateColor) + #2008 TIIE
   geom_line( aes(y=INTERNAL_DEBT_SA/coeff), size=1, color=debtColor) +  #2008 DEBT
+=======
+financial=financial + ggExtra::removeGrid()
+
+#2020
+#colors <- c("Internal debt" = debtColor, "Interest rate" = rateColor)
+covid=ggplot(crisis_20, aes(x=Date))+
+  geom_line( aes(y=as.numeric(AVG_TIIE91_EE)), size=1.2, color=rateColor, show.legend = TRUE) + #2008 TIIE
+  geom_line( aes(y=INTERNAL_DEBT_EE/coeff), size=1.2, color=debtColor, show.legend = TRUE) + #2008 DEBT
+>>>>>>> Stashed changes
   
+  #Scales
   scale_y_continuous(
     # Features of the first axis
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
     name = "Interest Rate",
     
@@ -325,6 +381,59 @@ crisis
 
 
 # 5. Same Graph -----------------------------------------------------------
+=======
+    name = "", limits=c(-0.6, 0.4),  minor_breaks = NULL 
+)+
+  
+  scale_x_date(name="", date_labels = "%Y-%m", date_breaks = "4 month", minor_breaks = NULL)+
+  
+  #Theme
+  theme_bw()+
+  theme_ipsum_rc()+
+  
+  theme(
+    axis.title.y = element_text(color = debtColor, size=13),
+    axis.text.x=element_text(angle=60, hjust=1),
+    #axis.title.y.right = element_text(color = debtColor, size=13) 
+    
+    panel.border = element_blank(), 
+    panel.grid.minor.y = element_blank(),
+    panel.grid.minor.x = element_blank()
+  ) +
+  geom_vline(xintercept=as.Date("2020-03-01"), color="gray", size=.5, linetype="solid")+
+  
+  annotate(geom="text", x=as.Date("2020-03-01"), y=0.15, 
+           label="COVID-19 crisis \n\ starts in Mexico", size=4)+ theme_ipsum_rc()+
+    
+  ggtitle("The Great Lockdown (2020)") 
+   
+  
+  
+  
+  #scale_colour_manual(values = colors)
+covid= covid + ggExtra::removeGrid()
+
+
+#Double Graph
+
+crisis=financial+covid
+ggsave("data-vis.png", height = 14.7,width = 22.05, units = "cm")
+
+
+
+###
+# How to add a second plot, missing.
+ ggplot()+
+  crisis+
+  labs(title="Interbank Interest Rates and Internal Public Debt During Crises ", 
+       subtitle="A visual analysis of the relationship between internal public debt and the loan market in Mexico during the 2008 and 2020 economic crises.",
+       caption="Sources: BANXICO, Sistema de Información Económica | Authors: Karina Pérez, Sebastián Ocampo")+
+  theme_ipsum_rc()
+
+
+crisis = ggplot() + egg::ggarrange(financial, covid, ncol=2) + 
+  plot_annotation(title = "My Multiplot Title")
+>>>>>>> Stashed changes
 
 #19 months before, 40 months after the cero period in the financial crisis of august, 2008.
 two_gether=full_join(crisis_08, crisis_20, by = "T")
