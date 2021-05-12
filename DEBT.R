@@ -20,8 +20,8 @@
 library(readxl)
 library(xts)
 library(dplyr)
-library(dygraphs)
 library(seasonal)
+library(hrbrthemes)
 library(ggplot2)
 install.packages("patchwork")
 library(patchwork)
@@ -151,16 +151,6 @@ ggplot(DATA, aes(x=dates))+
 #Graph as Time Series.
 DATA_TS=xts(x=DATA, order.by = dates) #xts object for relevant period (1997-2020)
 DATA_TS=DATA_TS[,2:ncol(DATA_TS)] #Removes redundant column (dates)
-
-# Another plot (USELESS)
-dygraph(DATA_TS[,3:4], main= "Debt!") %>%
-  dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.1, drawGrid = FALSE, colors="#D8AE5A") %>%
-  dyRangeSelector() %>%
-  dyCrosshair(direction = "vertical") %>%
-  dyHighlight(highlightCircleSize = 5, highlightSeriesBackgroundAlpha = 0.2, hideOnMouseOut = FALSE)  %>%
-  dyRoller(rollPeriod = 1)
-
-
 
 
 # 4. Event Studies --------------------------------------------------------
