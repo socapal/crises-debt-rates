@@ -1,4 +1,3 @@
-  
 ################################################################################
 ################################################################################
 ####################       Economic  Crisis     ################################
@@ -12,23 +11,24 @@
 ###################    SebastiÃ¡n Ocampo Palacios    ###########################
 ################################################################################
 --------------------------------------------------------------------------------
-
-# CODE -------------------------------------------------------------------
+  
+  # CODE -------------------------------------------------------------------
 
 # 1. Libraries & data -----------------------------------------------------
 
 library(readxl)
 library(xts)
 library(dplyr)
+library(dygraphs)
 library(seasonal)
-library(hrbrthemes)
 library(ggplot2)
-#install.packages("patchwork")
-#install.packages('systemfonts')
-library(patchwork)
+library(hrbrthemes)
+#install.packages("ggExtra")
+library(ggExtra)
 
 rm(list=ls())
-setwd("C:/Users/socap/OneDrive/Documentos/GitHub/crisis-debt-rates")
+#setwd("C:/Users/socap/OneDrive/Documentos/GitHub/crisis-debt-rates")
+setwd("C:/Users/secun/OneDrive/Documentos/6to/Money/Data Vizualization Project")
 
 DATA=read_xlsx("DEBT85-20.xlsx", col_names=FALSE, na="NA")
 DATA=DATA[2:434,] #Removes headers
@@ -125,8 +125,8 @@ rateColor <- "#69b3a2"
 debtColor <- rgb(0.2, 0.6, 0.9, 1)
 
 ggplot(DATA, aes(x=dates))+
-  geom_line( aes(y=as.numeric(AVG_TIIE91)), size=2, color=rateColor) + 
-  geom_line( aes(y=INTERNAL_DEBT/coeff), size=2, color=debtColor) +  # Divide by 10 to get the same range
+  geom_line( aes(y=as.numeric(AVG_TIIE91)), size=1, color=rateColor) + 
+  geom_line( aes(y=INTERNAL_DEBT/coeff), size=1, color=debtColor) +  # Divide by 10 to get the same range
   
   scale_y_continuous(
     # Features of the first axis
@@ -155,11 +155,6 @@ DATA_TS=DATA_TS[,2:ncol(DATA_TS)] #Removes redundant column (dates)
 
 
 # 4. Event Studies --------------------------------------------------------
-
-
-#extrafont::font_import()   ###Solves problems with theme_ipsum(). Takes a while.
-import_roboto_condensed()
-
 
 #We subset by years.
 crisis_08=DATA_TS[c("2007","2008", "2009", "2010", "2011")]
@@ -202,86 +197,107 @@ coeff <- as.numeric(1)#100000000
 rateColor <- "#69b3a2"
 debtColor <- rgb(0.2, 0.6, 0.9, 1)
 
-
 #2008
 financial= ggplot(crisis_08, aes(x=Date))+
   geom_line( aes(y=as.numeric(AVG_TIIE91_EE)), size=1.5, color=rateColor) + #2008 TIIE
   geom_line( aes(y=INTERNAL_DEBT_EE/coeff), size=1.5, color=debtColor) +  #2008 DEBT
-  
-  #Escalas
-  scale_y_continuous(
-    # Features of the first axis
-      name = "Changes in Interest Rates", limits=c(-0.6, 0.4), minor_breaks = NULL 
+  # Axis
+  scale_y_continuous(  
+    name = "Porcentual Changes", limits=c(-0.6, 0.4), minor_breaks = NULL
   )  + 
+  scale_x_date(name="", date_labels = "%Y-%m", date_breaks = "10 month", minor_breaks = NULL) +
   
-  scale_x_date(date_labels = "%Y-%m", date_breaks = "4 month", breaks = NULL) +
- 
   #Tema
-  
   theme_bw()+
+  theme_ipsum_rc()+
+  
   theme(
-    axis.title.y = element_text(color = rateColor, size=13),
-    
-    axis.text.x=element_text(angle=60, hjust=1), 
+    axis.title.y = element_text(color = "black", size=15, hjust=.5),
+    #axis.text.x=element_text(angle=60, hjust=1), 
     axis.title.x = element_text(size=13),
     
     #Removes grid
     panel.border = element_blank(), 
     panel.grid.major.y = element_blank(),
-    panel.grid.minor.x = element_blank()
+    panel.grid.major.x = element_blank()
     
   ) +
-  geom_vline(xintercept=as.Date("2008-08-01"), color="black", size=.5, linetype="dashed")+
   
-  annotate(geom="text", x=as.Date("2009-05-01"), y=0.3, 
-          label="Financial crisis starts in Mexico", size=4) +
+  geom_vline(xintercept=as.Date("2008-08-01"), color="gray", size=1, linetype="solid")+
+  
+  geom_hline(yintercept = 0.0, color="gray", size=.6, linetype="dotted")+
+  
+  annotate(geom="text", x=as.Date("2009-03-01"), y=0.35, 
+           label="Financial crisis \n\ starts in Mexico", size=4) +
+  
+  ggtitle("Global Financial Crisis (2008)") 
 
-  #T�tulos
-  ggtitle("Global Financial Crisis (2008)") +
-  theme_ipsum_rc()
 
+financial=financial + ggExtra::removeGrid()
 financial
 
+
 #2020
-#colors <- c("Internal debt" = debtColor, "Interest rate" = rateColor)
+
 covid=ggplot(crisis_20, aes(x=Date))+
-  geom_line( aes(y=as.numeric(AVG_TIIE91_EE)), size=1, color=rateColor, show.legend = TRUE) + #2008 TIIE
-  geom_line( aes(y=INTERNAL_DEBT_EE/coeff), size=1, color=debtColor, show.legend = TRUE) + #2008 DEBT
+  geom_line( aes(y=as.numeric(AVG_TIIE91_EE)), size=1.5, color=rateColor, show.legend = TRUE) + #2008 TIIE
+  geom_line( aes(y=INTERNAL_DEBT_EE/coeff), size=1.5, color=debtColor, show.legend = TRUE) + #2008 DEBT
   
+  #Scales
   scale_y_continuous(
     # Features of the first axis
-    name = "Internal Debt Growth Rate", n.breaks =4
-    # Add a second axis and specify its features
-    #sec.axis = sec_axis(~.*coeff, name="Internal Debt")
+    name = "", limits=c(-0.6, 0.4),  minor_breaks = NULL 
+  )+
+  
+  scale_x_date(name="", date_labels = "%Y-%m", date_breaks = "4 month", minor_breaks = NULL) +
+  
+  #Theme
+  theme_bw()+
+  theme_ipsum_rc()+
+  
+  theme(axis.text.x=element_text(angle=60, hjust=1),
+        axis.title.x = element_text(size=13),
+        
+        panel.border = element_blank(), 
+        panel.grid.minor.y = element_blank(),
+        panel.grid.minor.x = element_blank()
   ) +
+  geom_vline(xintercept=as.Date("2020-03-01"), color="gray", size=1, linetype="solid")+
   
- theme_ipsum() +  #No está funcionando esta línea :( 
+  geom_hline(yintercept = 0.0, color="gray", size=.6, linetype="dotted")+
   
-  theme(
-    axis.title.y = element_text(color = debtColor, size=13)
-    #axis.title.y.right = element_text(color = debtColor, size=13) 
-  ) +
-  geom_vline(xintercept=as.Date("2020-03-01"), color="black", size=.5, linetype="dashed")+
+  annotate(geom="text", x=as.Date("2020-03-01"), y=0.15, 
+           label="COVID-19 crisis \n\ starts in Mexico", size=4)+ 
+  theme_ipsum_rc() +
   
-  annotate(geom="text", x=as.Date("2020-07-01"), y=0.15, 
-           label="2020 COVID-19 \ncrisis starts", size=4)+
-  
-  #ggtitle("Title") +
-  # scale_x_date(date_labels = "%Y-%m", date_breaks = "2 year") +
-  scale_x_date(date_labels = "%Y-%m", date_breaks = "2 month") +
-  theme(axis.text.x=element_text(angle=60, hjust=1),, axis.title.x = element_text(size=13))
-  #scale_colour_manual(values = colors)
+  ggtitle("The Great Lockdown (2020)") 
+
+covid= covid + ggExtra::removeGrid()
+
 covid
 
 
+
+#Double Graph
+
 crisis=financial+covid
+
 crisis
+# ggsave("data-vis.png", height = 14.7,width = 22.05, units = "cm")
 
 
+###
+# How to add a second plot, missing.
+#ggplot()+
+#  crisis+
+#  labs(title="Interbank Interest Rates and Internal Public Debt During Crises ", 
+#       subtitle="A visual analysis of the relationship between internal public debt and the loan market in Mexico during the 2008 and 2020 economic crises.",
+#       caption="Sources: BANXICO, Sistema de Información Económica | Authors: Karina Pérez, Sebastián Ocampo")+
+#  theme_ipsum_rc()
 
 
-
-
+#crisis = ggplot() + egg::ggarrange(financial, covid, ncol=2) + 
+#  plot_annotation(title = "My Multiplot Title")
 
 
 
