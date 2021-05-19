@@ -23,9 +23,15 @@ library(dygraphs)
 library(seasonal)
 library(ggplot2)
 library(hrbrthemes)
+library(patchwork)
+library(tidyverse)
+library(extrafont)
+font_import(paths = c("C:/Users/secun/OneDrive/Documentos/R/win-library/4.0/hrbrthemes/fonts/roboto-condensed"), prompt = F)
+windowsFonts(sans="Roboto Condensed")
 
 rm(list=ls())
-setwd("C:/Users/socap/OneDrive/Documentos/GitHub/crisis-debt-rates")
+#setwd("C:/Users/socap/OneDrive/Documentos/GitHub/crisis-debt-rates")
+setwd("C:/Users/secun/OneDrive/Documentos/6to/Money/Data Vizualization Project")
 
 DATA=read_xlsx("DEBT85-20.xlsx", col_names=FALSE, na="NA")
 DATA=DATA[2:434,] #Removes headers
@@ -198,6 +204,7 @@ debtColor <- rgb(0.2, 0.6, 0.9, 1)
 financial= ggplot(crisis_08, aes(x=Date))+
   geom_line( aes(y=as.numeric(AVG_TIIE91_EE)), size=1.2, color=rateColor) + #2008 TIIE
   geom_line( aes(y=INTERNAL_DEBT_EE/coeff), size=1.2, color=debtColor) +  #2008 DEBT
+  
   # Axis
   scale_y_continuous(  
     name = "Porcentual Changes", limits=c(-0.6, 0.4), minor_breaks = NULL 
@@ -205,11 +212,14 @@ financial= ggplot(crisis_08, aes(x=Date))+
   scale_x_date(name="", date_labels = "%Y-%m", date_breaks = "10 month", minor_breaks = NULL) +
   
   #Tema
-  theme_bw()+
-  theme_ipsum_rc()+
+  theme_bw(base_family = "Roboto Condensed")+
+  theme_ipsum_rc(base_family = "Roboto Condensed")+
+ 
+  ggtitle("Global Financial Crisis (2008)")+
+ 
   
   theme(
-    axis.title.y = element_text(color = "black", size=13),
+    axis.title.y = element_text(color = "black", size=12),
     #axis.text.x=element_text(angle=60, hjust=1), 
     axis.title.x = element_text(size=13),
     
@@ -219,14 +229,10 @@ financial= ggplot(crisis_08, aes(x=Date))+
     panel.grid.major.x = element_blank()
     
   ) +
-  
   geom_vline(xintercept=as.Date("2008-08-01"), color="gray", size=.5, linetype="solid")+
   
   annotate(geom="text", x=as.Date("2008-10-01"), y=0.35, 
-           label="Financial crisis \n\ starts in Mexico", size=4) +
-  
-  ggtitle("Global Financial Crisis (2008)") 
-
+           label="Financial crisis \n\ starts in Mexico", size=4.5, ) 
 
 financial=financial + ggExtra::removeGrid()
 financial
@@ -250,7 +256,9 @@ covid=ggplot(crisis_20, aes(x=Date))+
   theme_bw()+
   theme_ipsum_rc()+
   
-  theme(axis.text.x=element_text(angle=60, hjust=1),
+ 
+  
+  theme(#axis.text.x=element_text(angle=60, hjust=1),
         axis.title.x = element_text(size=13),
         
         
@@ -261,7 +269,8 @@ covid=ggplot(crisis_20, aes(x=Date))+
   geom_vline(xintercept=as.Date("2020-03-01"), color="gray", size=.5, linetype="solid")+
   
   annotate(geom="text", x=as.Date("2020-03-01"), y=0.15, 
-           label="COVID-19 crisis \n\ starts in Mexico", size=4)+ theme_ipsum_rc()+
+           label="COVID-19 crisis \n\ starts in Mexico", size=4.5)+ 
+  
   
   ggtitle("The Great Lockdown (2020)") 
 
@@ -291,5 +300,3 @@ crisis
 
 #crisis = ggplot() + egg::ggarrange(financial, covid, ncol=2) + 
 #  plot_annotation(title = "My Multiplot Title")
-
-
