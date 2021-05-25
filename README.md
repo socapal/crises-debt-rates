@@ -7,4 +7,5 @@ Our visualization project focuses on the analysis of the relationship between ec
 Anna Karina Pérez Peña
 Sebastián Ocampo Palacios
 
-## Course: Monetary Policy, Spring 2021. Professor Alexander Dentler.
+## Course: 
+Monetary Policy, Spring 2021. Professor Alexander Dentler. Centro de Investigación y Docencia Económicas.
