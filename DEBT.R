@@ -19,15 +19,15 @@
 library(readxl)
 library(xts)
 library(dplyr)
-library(dygraphs)
 library(seasonal)
 library(ggplot2)
 library(hrbrthemes)
 library(patchwork)
 library(tidyverse)
 library(extrafont)
-font_import(paths = c("C:/Users/secun/OneDrive/Documentos/R/win-library/4.0/hrbrthemes/fonts/roboto-condensed"), prompt = F)
-windowsFonts(sans="Roboto Condensed")
+
+#font_import(paths = c("C:/Users/secun/OneDrive/Documentos/R/win-library/4.0/hrbrthemes/fonts/roboto-condensed"), prompt = F)
+#windowsFonts(sans="Roboto Condensed")
 
 rm(list=ls())
 #setwd("C:/Users/socap/OneDrive/Documentos/GitHub/crisis-debt-rates")
@@ -268,7 +268,7 @@ covid=ggplot(crisis_20, aes(x=Date))+
   ) +
   geom_vline(xintercept=as.Date("2020-03-01"), color="gray", size=.5, linetype="solid")+
   
-  annotate(geom="text", x=as.Date("2020-03-01"), y=0.15, 
+  annotate(geom="text", x=as.Date("2020-03-01"), y=0.40, 
            label="COVID-19 crisis \n\ starts in Mexico", size=4.5)+ 
   
   
@@ -285,7 +285,7 @@ covid
 crisis=financial+covid
 
 crisis
-# ggsave("data-vis.png", height = 14.7,width = 22.05, units = "cm")
+ggsave("data-vis.png", height = 16, width = 28, units = "cm", limitsize=FALSE)
 
 
 ###
