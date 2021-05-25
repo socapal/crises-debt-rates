@@ -229,7 +229,10 @@ financial= ggplot(crisis_08, aes(x=Date))+
     panel.grid.major.x = element_blank()
     
   ) +
+  
+  #Annotations
   geom_vline(xintercept=as.Date("2008-08-01"), color="gray", size=.5, linetype="solid")+
+  geom_hline(yintercept=as.numeric(0), color="gray", size=.5, linetype="solid")+
   
   annotate(geom="text", x=as.Date("2008-10-01"), y=0.35, 
            label="Financial crisis \n\ starts in Mexico", size=4.5, ) 
@@ -266,8 +269,10 @@ covid=ggplot(crisis_20, aes(x=Date))+
         panel.grid.minor.y = element_blank(),
         panel.grid.minor.x = element_blank()
   ) +
-  geom_vline(xintercept=as.Date("2020-03-01"), color="gray", size=.5, linetype="solid")+
   
+  #Annotations
+  geom_vline(xintercept=as.Date("2020-03-01"), color="gray", size=.5, linetype="solid")+
+  geom_hline(yintercept=as.numeric(0), color="gray", size=.5, linetype="solid")+
   annotate(geom="text", x=as.Date("2020-03-01"), y=0.40, 
            label="COVID-19 crisis \n\ starts in Mexico", size=4.5)+ 
   
