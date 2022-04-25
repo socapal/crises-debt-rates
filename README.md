@@ -3,6 +3,10 @@ Our visualization project focuses on the analysis of the relationship between ec
 
 ![Data Visualization](https://github.com/socapal/crises-debt-rates/blob/final-branch/data-vis%20(off-code).png)
 
+
+## Instructions:
+Use the R file to generate the visualizations which then will be further processed within the "Off-code changes" pptx file.
+
 ## Authors:
 Anna Karina Pérez Peña
 Sebastián Ocampo Palacios
